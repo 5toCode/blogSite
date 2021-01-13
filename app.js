@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require('mongoose');
 const ejs = require("ejs");
 const _ = require('lodash');
 
@@ -10,6 +11,21 @@ const contactContent = "Scelerisque eleifend donec pretium vulputate sapien. Rho
 const app = express();
 const posts = [];
 
+const dburl = process.env.DATABASEURL || 'mongodb://localhost:27017/blogsiteDB'
+
+mongoose.connect(dburl, {
+  useNewUrlParser: true, 
+  useUnifiedTopology: true, 
+  useFindAndModify: false 
+});
+
+const postSchema = new mongoose.Schema ({
+  postTitle: String,
+  postBody: String
+});
+
+const Post = mongoose.model('Post', postSchema);
+
 app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({
@@ -19,10 +35,16 @@ app.use(express.static("public"));
 
 
 app.get('/', function (req, res) {
-  res.render('home', {
-    homeStartingContent: homeStartingContent,
-    posts: posts,
-  })
+  Post.find({}, function(err, foundPosts) {
+    if (err) {
+      console.log(err)
+    } else {
+      res.render('home', {
+        homeStartingContent: homeStartingContent,
+        posts: foundPosts
+      });
+    }
+  });
 });
 
 app.get('/about', function (req, res) {
@@ -53,12 +75,17 @@ app.get('/posts/:postTitle', function (req, res) {
 });
 
 app.post('/compose', function (req, res) {
-  const post = {
-    postTitle: req.body.postTitle,
-    postBody: req.body.postBody
-  }
-  posts.push(post);
-  res.redirect('/');
+  const postTitle = req.body.postTitle;
+  const postBody = req.body.postBody;
+  const post = new Post ({
+    postTitle: postTitle,
+    postBody: postBody
+  });
+  post.save(function(err) {
+    if(!err) {
+      res.redirect('/');
+    }
+  });
 });
 
 
