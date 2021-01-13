@@ -1,0 +1,14 @@
+<%- include('partials/header'); -%>
+
+
+<h1>Home</h1>
+<p><%= homeStartingContent %></p>
+
+<% posts.forEach(post => { %>
+<% const length = 100; %>
+<% const postLink = '/posts/' + post.postTitle; %>
+<h1><%= post.postTitle %></h1>
+<p><%= post.postBody.substring(0, length) %> ... <a href="<%= postLink %>">[Read more]</a></p>
+<% }); %>
+
+<%- include('partials/footer'); -%>
