@@ -8,7 +8,7 @@
 <% const length = 100; %>
 <% const postLink = '/posts/' + post.postTitle; %>
 <h1><%= post.postTitle %></h1>
-<p><%= post.postBody.substring(0, length) %> ... <a href="<%= postLink %>">[Read more]</a></p>
+<p><%= post.postBody.substring(0, length) %> ... <a href="/posts/<%= post._id %>">[Read more]</a></p>
 <% }); %>
 
 <%- include('partials/footer'); -%>
